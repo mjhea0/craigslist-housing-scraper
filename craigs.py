@@ -1,3 +1,4 @@
+import feedparser
 
 
 class CraigslistAptScraper(object):
@@ -12,6 +13,10 @@ class CraigslistAptScraper(object):
 
     def extract_rss_link(self):
         print self.url
+        d = feedparser.parse(self.url)
+        print "\nTotal Listings: {}\n".format(len(d))
+        for post in d.entries:
+            print "Title: {}\nLink: {}\n".format(post.title, post.link)
 
     def collect_emails(self):
         pass
@@ -23,4 +28,4 @@ class CraigslistAptScraper(object):
 if __name__ == '__main__':
     craig = CraigslistAptScraper()
     craig.init()
-    test = craig.extract_rss_link()
+    craig.extract_rss_link()

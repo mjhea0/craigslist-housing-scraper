@@ -1,7 +1,13 @@
+
+
 class CraigslistAptScraper(object):
 
     def init(self):
-        pass
+        self.min_price = 1000
+        self.max_price = 3000
+        self.number_of_bedrooms = 2
+        self.gmail_address = raw_input("Enter your gmail address: ")
+        self.gmail_password = raw_input("Enter your gmail address password: ")
 
     def gather_info(self):
         pass
@@ -17,4 +23,5 @@ class CraigslistAptScraper(object):
 
 
 if __name__ == '__main__':
-    pass
+    craig = CraigslistAptScraper()
+    test = craig.init()

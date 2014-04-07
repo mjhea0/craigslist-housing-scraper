@@ -1,4 +1,5 @@
 import feedparser
+import requests
 
 
 class CraigslistAptScraper(object):
@@ -19,7 +20,8 @@ class CraigslistAptScraper(object):
             print "Title: {}\nLink: {}\n".format(post.title, post.link)
 
     def collect_emails(self):
-        pass
+        r = requests.get('https://api.github.com/user')
+        print r.status
 
     def send_emails(self):
         pass

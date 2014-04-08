@@ -1,5 +1,6 @@
 import feedparser
 import smtplib
+import os
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
@@ -13,12 +14,13 @@ class CraigslistAptScraper(object):
         self.number_of_bedrooms = raw_input("Enter the number of bedrooms: ")
         self.city = 'boulder'  # update, if necessary
         self.url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(self.city, self.number_of_bedrooms, self.max_price, self.min_price)
-        self.gmail_address = raw_input("Enter your gmail address: ")
+        self.fromaddr = raw_input("Enter your gmail address: ")
         self.gmail_password = raw_input("Enter your gmail password: ")
-        self.subject = 'regarding your listing on craigslist'  # update, if necessary
-        self.message = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary
+        # self.subject = 'regarding your listing on craigslist'  # update, if necessary
+        self.msg = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary
 
     def extract_rss_link(self):
+        os.system(['clear', 'cls'][os.name == 'nt'])
         print "searching ..."
         d = feedparser.parse(self.url)
         return d
@@ -59,11 +61,11 @@ class CraigslistAptScraper(object):
         # fire up gmail
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.starttls()
-        server.login(self.gmail_address, self.gmail_password)
+        server.login(self.fromaddr, self.gmail_password)
         count = 1
-        for address in all_emails:
-            server.sendmail(self.gmail_address, address, self.subject, self.message)
-            print "added {} email(s)".format(count)
+        for toaddrs in all_emails:
+            server.sendmail(self.fromaddr, toaddrs, self.msg)
+            print "sent {} email(s)".format(count)
             count += 1
         server.quit()
 

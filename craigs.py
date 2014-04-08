@@ -36,6 +36,7 @@ class CraigslistAptScraper(object):
                 driver.find_element_by_class_name("reply_button").click()
                 # driver.implicitly_wait(10)
                 try:
+                    # wait until selector is visible; throw exception if not visible after 10 seconds
                     element = WebDriverWait(driver, 10).until(
                         lambda driver: driver.find_element_by_class_name("reply_options")
                     )

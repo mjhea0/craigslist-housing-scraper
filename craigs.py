@@ -16,7 +16,7 @@ class CraigslistAptScraper(object):
         self.number_of_bedrooms = raw_input("Enter the number of bedrooms: ")
         self.city = 'boulder'  # update, if necessary
         self.url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(self.city, self.number_of_bedrooms, self.max_price, self.min_price)
-        self.fromaddr = raw_input("Enter your gmail address: ")
+        self.fromaddr = raw_input("Enter your gmail address (include \"@gmil.com\"): ")
         self.gmail_password = raw_input("Enter your gmail password: ")
         self.subject = 'regarding your listing on craigslist'  # update, if necessary
         self.content = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary

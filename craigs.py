@@ -7,14 +7,16 @@ from selenium.common.exceptions import NoSuchElementException
 class CraigslistAptScraper(object):
 
     def init(self):
-        self.min_price = 1000
-        self.max_price = 3000
-        self.number_of_bedrooms = 2
-        # self.gmail_address = raw_input("Enter your gmail address: ")
-        # self.gmail_password = raw_input("Enter your gmail address password: ")
-        self.url = 'http://boulder.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(self.number_of_bedrooms, self.max_price, self.min_price)
-        self.subject = 'regarding your listing on craigslist'
-        self.message = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'
+        self.min_price = raw_input("Enter the minimum price: ")
+        self.max_price = raw_input("Enter your maximum price: ")
+        self.number_of_bedrooms = raw_input("Enter the number of bedrooms: ")
+        self.city = 'boulder' # update, if necessary
+        self.url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(self.city, self.number_of_bedrooms, self.max_price, self.min_price)
+        self.gmail_address = raw_input("Enter your gmail address: ")
+        self.gmail_password = raw_input("Enter your gmail password: ")
+        self.subject = 'regarding your listing on craigslist' # update, if necessary
+        self.message = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!' # update, if necessary
+
 
     def extract_rss_link(self):
         print "searching ..."

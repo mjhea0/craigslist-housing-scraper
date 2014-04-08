@@ -2,9 +2,7 @@ import feedparser
 import smtplib
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, TimeoutException
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
 class CraigslistAptScraper(object):
@@ -56,6 +54,7 @@ class CraigslistAptScraper(object):
     def send_emails(self, all_emails):
         # remove duplicate emails
         print list(set(all_emails))
+        all_emails = ['hermanmu@gmail.com']
         print "sending emails ..."
         # fire up gmail
         server = smtplib.SMTP('smtp.gmail.com:587')
@@ -74,4 +73,4 @@ if __name__ == '__main__':
     craig.init()
     rss_results = craig.extract_rss_link()
     emails = craig.collect_emails(rss_results)
-    # craig.send_emails(emails)
+    craig.send_emails(emails)

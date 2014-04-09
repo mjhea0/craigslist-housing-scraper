@@ -15,13 +15,11 @@ class CraigslistAptScraper(object):
         self.max_price = raw_input("Enter your maximum price: ")
         self.number_of_bedrooms = raw_input("Enter the number of bedrooms: ")
         self.city = 'boulder'  # update, if necessary
-        self.url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=\
-            0&format=rss'.format(self.city, self.number_of_bedrooms, self.max_price, self.min_price)
+        self.url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(self.city, self.number_of_bedrooms, self.max_price, self.min_price)
         self.fromaddr = raw_input("Enter your gmail address (include \"@gmail.com\"): ")
         self.gmail_password = raw_input("Enter your gmail password: ")
         self.subject = 'regarding your listing on craigslist'  # update, if necessary
-        self.content = 'Hi, I\'m looking for a place to live in the area. \
-            Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary
+        self.content = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary
 
     def extract_rss_link(self):
         os.system(['clear', 'cls'][os.name == 'nt'])
@@ -57,12 +55,12 @@ class CraigslistAptScraper(object):
             driver.quit
         # remove duplicate emails
         email_addresses = list(set(email_addresses))
-        email_addresses = 0
-        if len(email_addresses) > 0: 
+        if len(email_addresses) > 0:
             print "Scraped {} emails".format(count - 1)
             return list(set(email_addresses))
         else:
-            return "Sorry no emails were scraped. Try widening your search criteria."
+            print "Sorry no emails were scraped. Try widening your search criteria.\n"
+            return 0
 
     def send_emails(self, all_emails):
         print "\nSending emails ..."
@@ -97,5 +95,6 @@ if __name__ == '__main__':
     craig.init()
     rss_results = craig.extract_rss_link()
     emails = craig.collect_emails(rss_results)
-    sent = craig.send_emails(emails)
-    craig.print_statistics(rss_results.entries, emails, sent)
+    if emails != 0:
+        sent = craig.send_emails(emails)
+        craig.print_statistics(rss_results.entries, emails, sent)

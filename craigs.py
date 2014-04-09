@@ -10,16 +10,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 class CraigslistAptScraper(object):
 
-    def init(self):
-        self.min_price = raw_input("Enter the minimum price: ")
-        self.max_price = raw_input("Enter your maximum price: ")
-        self.number_of_bedrooms = raw_input("Enter the number of bedrooms: ")
-        self.city = 'boulder'  # update, if necessary
-        self.url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(self.city, self.number_of_bedrooms, self.max_price, self.min_price)
-        self.fromaddr = raw_input("Enter your gmail address (include \"@gmail.com\"): ")
-        self.gmail_password = raw_input("Enter your gmail password: ")
-        self.subject = 'regarding your listing on craigslist'  # update, if necessary
-        self.content = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary
+    def init(self, min_price, max_price, number_of_bedrooms, city, url, fromaddr, gmail_password, subject, content):
+        self.min_price = min_price
+        self.max_price = max_price
+        self.number_of_bedrooms = number_of_bedrooms
+        self.city = city
+        self.url = url
+        self.fromaddr = fromaddr
+        self.gmail_password = gmail_password
+        self.subject = subject
+        self.content = content
 
     def extract_rss_link(self):
         os.system(['clear', 'cls'][os.name == 'nt'])
@@ -64,7 +64,7 @@ class CraigslistAptScraper(object):
 
     def send_emails(self, all_emails):
         print "\nSending emails ..."
-        all_emails = ['hermanmu@gmail.com', 'hermanmu@gmail.com']
+        all_emails = ['hermanmu@gmail.com', 'hermanmu@gmail.com']  # testing
         # connect to the server
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.ehlo()
@@ -87,12 +87,23 @@ class CraigslistAptScraper(object):
     def print_statistics(self, rss_feed_results, all_emails, emails_sent):
         print "# ---------------------- Final Stats ---------------------- #"
         print "Out of {} listings, {} emails were found and {} emails were sent.\n".format(
-            len(rss_feed_results), len(all_emails) - 1, emails_sent - 1)
+            len(rss_feed_results), len(all_emails), emails_sent - 1)
 
 
 if __name__ == '__main__':
+    # inputs
+    min_price = raw_input("Enter the minimum price: ")
+    max_price = raw_input("Enter your maximum price: ")
+    number_of_bedrooms = raw_input("Enter the number of bedrooms: ")
+    city = 'boulder'  # update, if necessary
+    url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(city, number_of_bedrooms, max_price, min_price)
+    fromaddr = raw_input("Enter your gmail address (include \"@gmail.com\"): ")
+    gmail_password = raw_input("Enter your gmail password: ")
+    subject = 'regarding your listing on craigslist'  # update, if necessary
+    content = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary
+
     craig = CraigslistAptScraper()
-    craig.init()
+    craig.init(min_price, max_price, number_of_bedrooms, city, url, fromaddr, gmail_password, subject, content)
     rss_results = craig.extract_rss_link()
     emails = craig.collect_emails(rss_results)
     if emails != 0:

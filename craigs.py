@@ -16,19 +16,20 @@ class CraigslistAptScraper(object):
         self.number_of_bedrooms = raw_input("Enter the number of bedrooms: ")
         self.city = 'boulder'  # update, if necessary
         self.url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(self.city, self.number_of_bedrooms, self.max_price, self.min_price)
-        self.fromaddr = raw_input("Enter your gmail address (include \"@gmil.com\"): ")
+        self.fromaddr = raw_input("Enter your gmail address (include \"@gmail.com\"): ")
         self.gmail_password = raw_input("Enter your gmail password: ")
         self.subject = 'regarding your listing on craigslist'  # update, if necessary
         self.content = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary
 
     def extract_rss_link(self):
         os.system(['clear', 'cls'][os.name == 'nt'])
-        print "searching ..."
+        print "Searching craigslist ..."
         d = feedparser.parse(self.url)
+        print "Found {} listings.".format(len(d.entries))
         return d
 
     def collect_emails(self, rss_feed_results):
-        print "grabbing emails ..."
+        print "\nGrabbing emails ..."
         email_addresses = []
         count = 1
         for listing in rss_feed_results.entries:
@@ -46,19 +47,19 @@ class CraigslistAptScraper(object):
                     print "timeout"
                 element = driver.find_element_by_xpath('//*[@class="reply_options"]/ul[4]/li/input')
                 mailto = element.get_attribute('value')
-                email_addresses.append(mailto)
-                print "added {} email(s)".format(count)
+                email_addresses.append(str(mailto))
+                print "Scraped email # {}".format(count)
                 count += 1
             except NoSuchElementException:
                 pass
             driver.quit
         # remove duplicate emails
-        print list(set(email_addresses))
-        return email_addresses
+        print "Scraped {} emails".format(count - 1)
+        return list(set(email_addresses))
 
     def send_emails(self, all_emails):
-        all_emails = ['hermanmu@gmail.com']
-        print "sending emails ..."
+        print "\nSending emails ..."
+        all_emails = ['hermanmu@gmail.com', 'hermanmu@gmail.com']
         # connect to the server
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.ehlo()
@@ -72,9 +73,16 @@ class CraigslistAptScraper(object):
             msg['Subject'] = self.subject
             msg.attach(MIMEText(self.content))
             server.sendmail(self.fromaddr, toaddr, msg.as_string())
-            print "sent {} email(s)".format(count)
+            print "Sent email # {}".format(count)
             count += 1
         server.quit()
+        print "\nDone! You sent {} emails!\n".format(count - 1)
+        return count
+
+    def print_statistics(self, rss_feed_results, all_emails, emails_sent):
+        print "# ---------------------- Final Stats ---------------------- #"
+        print "Out of {} listings, {} emails were found and {} emails were sent.\n".format(
+            len(rss_feed_results), len(all_emails) - 1, emails_sent - 1)
 
 
 if __name__ == '__main__':
@@ -82,4 +90,5 @@ if __name__ == '__main__':
     craig.init()
     rss_results = craig.extract_rss_link()
     emails = craig.collect_emails(rss_results)
-    craig.send_emails(emails)
+    sent = craig.send_emails(emails)
+    craig.print_statistics(rss_results.entries, emails, sent)

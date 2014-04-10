@@ -69,20 +69,24 @@ class CraigslistAptScraper(object):
         server = smtplib.SMTP('smtp.gmail.com:587')
         server.ehlo()
         server.starttls()
-        server.login(self.fromaddr, self.gmail_password)
-        count = 1
-        for toaddr in all_emails:
-            msg = MIMEMultipart()
-            msg['From'] = self.fromaddr
-            msg['To'] = toaddr
-            msg['Subject'] = self.subject
-            msg.attach(MIMEText(self.content))
-            server.sendmail(self.fromaddr, toaddr, msg.as_string())
-            print "Sent email # {}".format(count)
-            count += 1
-        server.quit()
-        print "\nDone! You sent {} emails!\n".format(count - 1)
-        return count
+        try:
+            server.login(self.fromaddr, self.gmail_password)
+            count = 1
+            for toaddr in all_emails:
+                msg = MIMEMultipart()
+                msg['From'] = self.fromaddr
+                msg['To'] = toaddr
+                msg['Subject'] = self.subject
+                msg.attach(MIMEText(self.content))
+                server.sendmail(self.fromaddr, toaddr, msg.as_string())
+                print "Sent email # {}".format(count)
+                count += 1
+            server.quit()
+            print "\nDone! You sent {} emails!\n".format(count - 1)
+            return count
+        except smtplib.SMTPAuthenticationError:
+            print "Sorry. Your Gmail email address and/or password is incorrect Please try again.\n"
+            return 0
 
     def print_statistics(self, rss_feed_results, all_emails, emails_sent):
         print "# ---------------------- Final Stats ---------------------- #"
@@ -108,4 +112,5 @@ if __name__ == '__main__':
     emails = craig.collect_emails(rss_results)
     if emails != 0:
         sent = craig.send_emails(emails)
+    if sent != 0:
         craig.print_statistics(rss_results.entries, emails, sent)

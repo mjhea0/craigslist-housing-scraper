@@ -10,7 +10,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 class CraigslistAptScraper(object):
 
-    def init(self, min_price, max_price, number_of_bedrooms, city, url, fromaddr, gmail_password, subject, content):
+    def __init__(self, min_price, max_price, number_of_bedrooms, city, url, fromaddr, gmail_password, subject, content):
         self.min_price = min_price
         self.max_price = max_price
         self.number_of_bedrooms = number_of_bedrooms
@@ -93,24 +93,22 @@ class CraigslistAptScraper(object):
         print "Out of {} listings, {} emails were found and {} emails were sent.\n".format(
             len(rss_feed_results), len(all_emails), emails_sent - 1)
 
+    if __name__ == '__main__':
+        # inputs
+        min_price = raw_input("Enter the minimum price: ")
+        max_price = raw_input("Enter your maximum price: ")
+        number_of_bedrooms = raw_input("Enter the number of bedrooms: ")
+        city = 'boulder'  # update, if necessary
+        url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(city, number_of_bedrooms, max_price, min_price)
+        fromaddr = raw_input("Enter your gmail address (include \"@gmail.com\"): ")
+        gmail_password = raw_input("Enter your gmail password: ")
+        subject = 'regarding your listing on craigslist'  # update, if necessary
+        content = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary
 
-if __name__ == '__main__':
-    # inputs
-    min_price = raw_input("Enter the minimum price: ")
-    max_price = raw_input("Enter your maximum price: ")
-    number_of_bedrooms = raw_input("Enter the number of bedrooms: ")
-    city = 'boulder'  # update, if necessary
-    url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(city, number_of_bedrooms, max_price, min_price)
-    fromaddr = raw_input("Enter your gmail address (include \"@gmail.com\"): ")
-    gmail_password = raw_input("Enter your gmail password: ")
-    subject = 'regarding your listing on craigslist'  # update, if necessary
-    content = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary
-
-    craig = CraigslistAptScraper()
-    craig.init(min_price, max_price, number_of_bedrooms, city, url, fromaddr, gmail_password, subject, content)
-    rss_results = craig.extract_rss_link()
-    emails = craig.collect_emails(rss_results)
-    if emails != 0:
-        sent = craig.send_emails(emails)
-    if sent != 0:
-        craig.print_statistics(rss_results.entries, emails, sent)
+        craig = CraigslistAptScraper(min_price, max_price, number_of_bedrooms, city, url, fromaddr, gmail_password, subject, content)
+        rss_results = craig.extract_rss_link()
+        emails = craig.collect_emails(rss_results)
+        if emails != 0:
+            sent = craig.send_emails(emails)
+        if sent != 0:
+            craig.print_statistics(rss_results.entries, emails, sent)

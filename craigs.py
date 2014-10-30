@@ -9,6 +9,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
+from config import *
+
 
 class CraigslistAptScraper(object):
 
@@ -103,17 +105,6 @@ class CraigslistAptScraper(object):
             len(rss_feed_results), len(all_emails), emails_sent - 1)
 
 if __name__ == '__main__':
-    # inputs
-    min_price = raw_input("Enter the minimum price: ")
-    max_price = raw_input("Enter your maximum price: ")
-    number_of_bedrooms = raw_input("Enter the number of bedrooms: ")
-    city = 'boulder'  # update, if necessary
-    url = 'http://{}.craigslist.org/search/hhh?bedrooms={}&catAbb=hhh&maxAsk={}&minAsk={}&s=0&format=rss'.format(city, number_of_bedrooms, max_price, min_price)
-    fromaddr = raw_input(
-        "Enter your gmail address (include \"@gmail.com\"): ")
-    gmail_password = raw_input("Enter your gmail password: ")
-    subject = 'regarding your listing on craigslist'  # update, if necessary
-    content = 'Hi, I\'m looking for a place to live in the area. Would it be possible to set up a time to come by and have a look? Thanks so much!'  # update, if necessary
 
     craig = CraigslistAptScraper(
         min_price, max_price, number_of_bedrooms,

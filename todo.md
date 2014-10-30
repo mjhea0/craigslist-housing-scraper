@@ -1,1 +1,2 @@
-Web App via Flask
+1. Web App via Flask
+2. Database

@@ -1,6 +1,7 @@
 import os
 import smtplib
 import feedparser
+import sqlite3
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from selenium import webdriver
@@ -8,7 +9,6 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-
 from config import *
 
 
@@ -30,9 +30,9 @@ class CraigslistAptScraper(object):
     def extract_rss_link(self):
         os.system(['clear', 'cls'][os.name == 'nt'])
         print "Searching craigslist ..."
-        d = feedparser.parse(self.url)
-        print "Found {} listings.".format(len(d.entries))
-        return d
+        listings = feedparser.parse(self.url)
+        print "Found {} listings.".format(len(listings.entries))
+        return listings
 
     def collect_emails(self, rss_feed_results):
         print "\nGrabbing emails ..."
@@ -74,7 +74,29 @@ class CraigslistAptScraper(object):
             print "No emails were scraped. Try widening your search criteria.\n"
             return 0
 
-    def send_emails(self, all_emails):
+    def add_to_database(self, all_emails):
+        new_emails = []
+        # create database and table (if necessary)
+        con = sqlite3.connect('emails.db')
+        with con:
+            cur = con.cursor()
+            try:
+                cur.execute(
+                    "CREATE TABLE emails(id INTEGER PRIMARY KEY, email TEXT)")
+            except sqlite3.OperationalError:
+                pass
+            # loop through scrapped emails
+            for email in all_emails:
+                cur.execute("SELECT * FROM emails where email = ?", (email,))
+                check = cur.fetchone()
+                # if email is not in db, add it to the db and to the list
+                if check is None:
+                    cur.execute("INSERT INTO emails(email) VALUES (?)",
+                                (email,))
+                    new_emails.append(email)
+            return new_emails
+
+    def send_emails(self, new_emails):
         print "\nSending emails ..."
         # connect to the server
         server = smtplib.SMTP('smtp.gmail.com:587')
@@ -83,7 +105,7 @@ class CraigslistAptScraper(object):
         try:
             server.login(self.fromaddr, self.gmail_password)
             count = 1
-            for toaddr in all_emails:
+            for toaddr in new_emails:
                 msg = MIMEMultipart()
                 msg['From'] = self.fromaddr
                 msg['To'] = toaddr
@@ -101,8 +123,9 @@ class CraigslistAptScraper(object):
 
     def print_statistics(self, rss_feed_results, all_emails, emails_sent):
         print "# ---------------------- Final Stats ---------------------- #"
-        print "Out of {} listings, {} emails were found and {} emails were sent.\n".format(
-            len(rss_feed_results), len(all_emails), emails_sent - 1)
+        print "Out of {} listings...".format(len(rss_feed_results))
+        print "...{} emails were found and {} emails were sent.\n".format(
+            len(all_emails), emails_sent - 1)
 
 if __name__ == '__main__':
 
@@ -110,8 +133,10 @@ if __name__ == '__main__':
         min_price, max_price, number_of_bedrooms,
         city, url, fromaddr, gmail_password, subject, content)
     rss_results = craig.extract_rss_link()
-    emails = craig.collect_emails(rss_results)
-    if emails != 0:
-        sent = craig.send_emails(emails)
-        if sent != 0:
-            craig.print_statistics(rss_results.entries, emails, sent)
+    all_emails = craig.collect_emails(rss_results)
+    if all_emails:
+        new_emails = craig.add_to_database(all_emails)
+        if new_emails != 0:
+            sent = craig.send_emails(new_emails)
+            if sent != 0:
+                craig.print_statistics(rss_results.entries, all_emails, sent)
